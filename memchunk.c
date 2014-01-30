@@ -13,12 +13,6 @@
 
 static sigjmp_buf env;
 
-struct memchunk {
-        void *start;
-        unsigned long length;
-        int RW;
-};
-
 int get_mem_layout (struct memchunk *chunk_list, int size) {
         int pageSize = getpagesize();
         int chunkCount = 0;
@@ -30,52 +24,101 @@ int get_mem_layout (struct memchunk *chunk_list, int size) {
 	while (memLocation < end) {
 		int access;
 		int lastAccess;
-		int chunkSize;
 		access = check_access(*memLocation)
-		if (access == -1) {
-			if (lastAccess == access) {
-				continue;
-			}
-			else {
-				chunkCount++
-				
-		if (access == 0) {
-			if (lastAccess == access) {
-				chunkSize++;
-				chunk_list[listIndex].length += pageSize;
-			}
-			else {
-				if (lastAccess == 1) {
-					chunkCount++;
+		if (listIndex == size) {
+			if (access == -1) {
+				if (lastAccess == access) {
+					memLocation += pageSize;
+					continue;
 				}
-				chunkSize = 1
-				listIndex++;
-				lastAccess = 0;
-				chunk_list[listIndex].*start = *memLocation;
-				chunk_list[listIndex].length = 0;
-				chunk_list[listIndex].length += pageSize;
-				chunk_list[listIndex].RW = 0;
+				else {
+					chunkCount++
+					lastAccess = -1
+					memLocation += pageSize;
+				}
+			}
+				
+			if (access == 0) {
+				if (lastAccess == access) {
+					memLocation += pageSize;
+				}
+				else {
+					if (lastAccess == 1) {
+						chunkCount++;
+					}
+					lastAccess = 0;
+					memLocation += pageSize;
+				}
+			}	
+	
+			if (access == 1) {
+				if (lastAccess == access) {
+					memLocation += pageSize;
+				}
+				else {
+					if (lastAccess == 0) {
+						chunkCount++;
+					}
+					listIndex++;
+					lastAccess = 1;
+					memLocation += pageSize;
+				}
 			}
 		}
 
-		if (access == 1) {
-			if (lastAccess == access) {
-				chunkSize++;
-				chunk_list[listIndex].length += pageSize;
-			}
-			else {
-				if (lastAccess == 0) {
-					chunkCount++;
+		else {		
+			if (access == -1) {
+				if (lastAccess == access) {
+					memLocation += pageSize;
+					continue;
 				}
-				chunkSize = 1
-				listIndex++;
-				lastAccess = 1;
-				chunk_list[listIndex].*start = *memLocation;
-				chunk_list[listIndex].length = 0;
-				chunk_list[listIndex].length += pageSize;
-				chunk_list[listIndex].RW = 1;
+				else {
+					chunkCount++
+					lastAccess = -1
+					memLocation += pageSize;
+				}
+			}
+				
+			if (access == 0) {
+				if (lastAccess == access) {
+					chunk_list[listIndex].length += pageSize;
+					memLocation += pageSize;
+				}
+				else {
+					if (lastAccess == 1) {
+						chunkCount++;
+					}
+					listIndex++;
+					lastAccess = 0;
+					chunk_list[listIndex].*start = *memLocation;
+					chunk_list[listIndex].length = 0;
+					chunk_list[listIndex].length += pageSize;
+					chunk_list[listIndex].RW = 0;
+					memLocation += pageSize;
+				}
+			}	
+	
+			if (access == 1) {
+				if (lastAccess == access) {
+					chunk_list[listIndex].length += pageSize;
+					memLocation += pageSize;
+				}
+				else {
+					if (lastAccess == 0) {
+						chunkCount++;
+					}
+					listIndex++;
+					lastAccess = 1;
+					chunk_list[listIndex].*start = *memLocation;
+					chunk_list[listIndex].length = 0;
+					chunk_list[listIndex].length += pageSize;
+					chunk_list[listIndex].RW = 1;
+					memLocation += pageSize;
+				}
 			}
 		}
+	}
+	return chunkCount;
 }
 
 
