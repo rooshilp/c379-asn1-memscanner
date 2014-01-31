@@ -19,7 +19,7 @@ int main()
 	chunkCount = get_mem_layout(&chunk_list, size);
 	printf("%d\n", chunkCount);
 	int i;
-	for (i = 0;i < 20; i++) {
+	for (i = 0;i < chunkCount; i++) {
 		printf("%p - %d - %d\n", chunk_list[i].start, chunk_list[i].length, chunk_list[i].RW);
 	}
 }
