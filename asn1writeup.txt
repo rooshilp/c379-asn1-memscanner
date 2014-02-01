@@ -1,11 +1,24 @@
-10
+Rooshil Patel
+1255318
+Assignment 1
+CMPUT 379 
+
+Number of chunks: 10
 0x8048000 - 8192 - 0
 0x804a000 - 4096 - 1
-0x8b98000 - 135168 - 1
-0xf75b2000 - 4096 - 1
-0xf75b3000 - 1728512 - 0
-0xf7759000 - 16384 - 1
-0xf778f000 - 8192 - 1
-0xf7791000 - 139264 - 0
-0xf77b3000 - 4096 - 1
-0xff9b2000 - 139264 - 1
+0x879c000 - 135168 - 1
+0xf75a6000 - 4096 - 1
+0xf75a7000 - 1728512 - 0
+0xf774d000 - 16384 - 1
+0xf7783000 - 8192 - 1
+0xf7785000 - 139264 - 0
+0xf77a7000 - 4096 - 1
+0xfff80000 - 139264 - 1
+
+When executing memscantest, the program executes get_mem_layout from its own virtual memory location. In the test program's virtual memory location, the text segment and the data and bss segment are loaded first. These values are loaded, begining from the 0 location in the virtual memory provided which would map to the lowest address outputed. We can confirm this as the lowest memory address, 0x8048000 has a RW value of 0, exactly what the text segment of memory would have. 
+
+We see that the next segment has an RW value of 1, corresponding to the the memory map for the data and bss segment, which follows the text. These segments are mapped concurently through the page table. Because of this predetermined allocaion of vitual memory and because a variable had memory allocated to it via malloc, the next segment, starting at 0x879c000 would be the heap. We know this because it follows the text, data and bss segments and has an RW value of 1, since the program has access to write to it. This memory contains all dynamically allocated memory and can expand or contract depending on allocation requirements. 
+
+The addresses following the heap until address 0xfff80000 contain static and shared libraries as well as the dynamic loader. 
+
+The last segment, at addresss 0xfff80000, contains the stack. Memory for the stack is allocated from the largest address available in memory from the page table and has an RW access of 1, as the program has read and write access to this segment. The stack can be extended into lower memory addresses, as it was initially allocated at the top of the virtual memory allocated to the program, in case additional memory is required.
