@@ -11,9 +11,12 @@
 
 int size;
 int chunkCount;
+int x;
 
 int main()
 {
+	x = malloc(sizeof(int));
+	x = 7;
 	struct memchunk chunk_list[20];
 	size = 20;
 	chunkCount = get_mem_layout(&chunk_list, size);
