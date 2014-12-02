@@ -4,7 +4,6 @@ c379-asn1-memscanner
 C memory scanner. Assignment for C379
 
 Rooshil Patel
-1255318
 
 How to use:
 
